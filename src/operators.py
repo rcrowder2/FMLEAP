@@ -87,6 +87,36 @@ def truncation(population, mu):
         yield ind
 
 
+@curry
+def tournament(population, n, num_competitors=2):
+    """
+    Select `n` individuals form a population via tournament selection.
+
+    :param list population: A list of :py:class:`Individual`s
+    :param int n: The number of individuals to select
+    :param int num_competitors: The number of individuals that compete in each tournament
+    :return: A generator that produces `n` individuals
+
+    >>> from individual import Individual
+    >>> pop = [Individual(genome=[1, 0, 1, 1, 0], fitness=3), \
+               Individual(genome=[0, 0, 1, 0, 0], fitness=1), \
+               Individual(genome=[0, 1, 1, 1, 1], fitness=4), \
+               Individual(genome=[1, 0, 0, 0, 1], fitness=2)]
+    >>> result = tournament(pop, 3)
+    >>> result # doctest:+ELLIPSIS
+    <generator object tournament at ...>
+
+    >>> print(*list(result), sep='\\n') # doctest:+ELLIPSIS
+    [...]
+    [...]
+    [...]
+
+    """
+    for i in range(n):
+        competitors = np.random.choice(population, num_competitors)
+        yield max(competitors, key=lambda x: x.fitness)
+
+
 def best(population):
     """
     >>> from individual import Individual
@@ -97,6 +127,7 @@ def best(population):
     >>> best(pop)
     [0, 1, 1, 1, 1]
     """
+    assert(len(population) > 0)
     return max(population, key=lambda x: x.fitness)
 
 

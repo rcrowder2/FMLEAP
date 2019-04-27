@@ -1,29 +1,10 @@
 #!/usr/bin/env python3
 
 import click
-import toolz
 
+import evolve
 import real
 import operators as op
-
-
-def evolve_mu_plus_lambda(evals, initializer, parent_selector, pipeline, evaluator):
-    population = initializer()
-    population = list(evaluator(population))
-
-    i = 0
-    while i < evals:
-        # Selects parents
-        parents = list(parent_selector(population))
-
-        # Create a generator that creates offspring
-        offspring = toolz.pipe(parents, *pipeline)
-        offspring = list(offspring)  # Execute it
-
-        population = parents + evaluator(offspring)
-        i += len(offspring)
-
-        yield (i, op.best(population))
 
 
 @click.command()
@@ -45,28 +26,18 @@ def run(mu, lambda_, l, mutation_prob, mutation_std, evals):
     if not mutation_prob:
         mutation_prob = 1/l
 
-    # Set up a function to produce the initial population
-    initializer = real.random_initializer(mu + lambda_, l)
-
-    # Set up a function to select μ parents
-    parent_selector = op.truncation(mu=mu)
-
-    # Set up the operator pipeline
-    pipeline = [
-        op.cloning(offspring_per_ind=int(lambda_/mu)),
-        op.mutate_gaussian(prob=mutation_prob, std=mutation_std)
-    ]
-
-    # Set up the fitness function
-    fun = real.cosine_family(alpha=0.6, global_optima_counts=[5]*l, local_optima_counts=[5]*l)
-    evaluator = op.evaluate(fitness_function=fun)
-
-    # Setup the EA
-    result = evolve_mu_plus_lambda(evals,
-                                   initializer=initializer,
-                                   parent_selector=parent_selector,
-                                   pipeline=pipeline,
-                                   evaluator=evaluator)
+    result = evolve.mu_plus_lambda(evals,
+                                   initialize=real.random_initializer(mu + lambda_, l),
+                                   parent_selector=op.truncation(mu=mu),
+                                   pipeline=[
+                                        op.cloning(offspring_per_ind=int(lambda_/mu)),
+                                        op.mutate_gaussian(prob=mutation_prob, std=mutation_std)
+                                   ],
+                                   evaluate=op.evaluate(
+                                       fitness_function=real.cosine_family(alpha=0.6,
+                                                                           global_optima_counts=[5]*l,
+                                                                           local_optima_counts=[5]*l)
+                                   ))
 
     # Print the result
     print("Eval, Best_Fitness")
