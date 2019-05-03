@@ -1,0 +1,5 @@
+.pyc
+.idea/
+__pycache__
+docs/build/
+venv/
