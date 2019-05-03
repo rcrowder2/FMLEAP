@@ -1,7 +1,9 @@
 import numpy as np
+from dask import delayed
+from dask.distributed import Client
 
 
-def tune_random(algorithm, metric, samples, tests_per_sample=5, **kwargs):
+def tune_random(algorithm, metric, samples, client, tests_per_sample=5, **kwargs):
     """
     Tune the real-valued parameters of an algorithm using random sampling.
 
@@ -56,19 +58,19 @@ def tune_random(algorithm, metric, samples, tests_per_sample=5, **kwargs):
     # TODO: Rewrite to use Dask
     # Take a Dask 'Client' object as an optional input, and use in conjunction with dask_jobqueue to support clusters:
     # https://jobqueue.dask.org/en/latest/
-    best_config = None
-    best = float('-inf')
 
+    @delayed
     def run(**kwargs):
         result = list(algorithm(**kwargs))
         x, y = zip(*result)
         return metric(x, [ind.fitness for ind in y])
 
+    scores = []
     for i in range(samples):
         configuration = {k: np.random.uniform(*v) for k, v in kwargs.items()}
-        scores = [run(**configuration) for _ in range(tests_per_sample)]
-        score = np.mean(scores)
-        if score > best:
-            best_config = configuration
-            best = score
-        yield (best, best_config)
+        config_scores = [run(**configuration) for _ in range(tests_per_sample)]
+
+        score = delayed(lambda x: (np.mean(x), configuration))(config_scores)
+        scores.append(score)
+    return client.gather(client.compute(scores))
+
