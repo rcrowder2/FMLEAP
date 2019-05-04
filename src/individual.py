@@ -5,7 +5,7 @@ class Individual:
         self.fitness = fitness
 
     def __repr__(self):
-        return f"{self.genome}"
+        return "{}".format(self.genome)
 
     def copy(self):
         return Individual(self.genome.copy())
