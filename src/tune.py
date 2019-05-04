@@ -37,17 +37,19 @@ def tune_random(algorithm, metric, samples, client, tests_per_sample=5, **kwargs
     ...                                                                 local_optima_counts=[5]*10)
     ...                         ))
 
+    Now we require a :py:mod:`dask` :py:class:`Client` to tell the parameter tuner how to parallelize its runs.  We'll
+    stick with the default client here, which creates separate processes on the local machine, one per core:
+
+    >>> from dask.distributed import Client
 
     Here is how we'd tune the there free parameters to maximize the AUC measure:
 
     >>> from metrics import area_under_curve
-    >>> result = tune_random(my_algorithm(pop_size=10), area_under_curve, 5,
+    >>> result = tune_random(my_algorithm(pop_size=10), area_under_curve, 5, Client(),
     ...                      mutation_prob=(0.001, 0.2),
     ...                      mutation_std=(0.001, 0.1))
-    >>> result # doctest:+ELLIPSIS
-    <generator object ...>
 
-    >>> print(*list(result), sep='\\n') # doctest:+ELLIPSIS
+    >>> print(*result, sep='\\n') # doctest:+ELLIPSIS
     (..., {'mutation_prob': ..., 'mutation_std': ...})
     (..., {'mutation_prob': ..., 'mutation_std': ...})
     (..., {'mutation_prob': ..., 'mutation_std': ...})
