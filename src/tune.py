@@ -45,11 +45,11 @@ def tune_random(algorithm, metric, samples, client, tests_per_sample=5, **kwargs
     Here is how we'd tune the there free parameters to maximize the AUC measure:
 
     >>> from metrics import area_under_curve
-    >>> result = tune_random(my_algorithm(pop_size=10), area_under_curve, 5, Client(),
-    ...                      mutation_prob=(0.001, 0.2),
-    ...                      mutation_std=(0.001, 0.1))
+    >>> scores, configurations = tune_random(my_algorithm(pop_size=10), area_under_curve, 5, Client(),
+    ...                                      mutation_prob=(0.001, 0.2),
+    ...                                      mutation_std=(0.001, 0.1))
 
-    >>> print(*result, sep='\\n') # doctest:+ELLIPSIS
+    >>> print(*zip(scores, configurations), sep='\\n') # doctest:+ELLIPSIS
     (..., {'mutation_prob': ..., 'mutation_std': ...})
     (..., {'mutation_prob': ..., 'mutation_std': ...})
     (..., {'mutation_prob': ..., 'mutation_std': ...})
@@ -57,9 +57,6 @@ def tune_random(algorithm, metric, samples, client, tests_per_sample=5, **kwargs
     (..., {'mutation_prob': ..., 'mutation_std': ...})
 
     """
-    # TODO: Rewrite to use Dask
-    # Take a Dask 'Client' object as an optional input, and use in conjunction with dask_jobqueue to support clusters:
-    # https://jobqueue.dask.org/en/latest/
 
     @delayed
     def run(**kwargs):
@@ -68,11 +65,14 @@ def tune_random(algorithm, metric, samples, client, tests_per_sample=5, **kwargs
         return metric(x, [ind.fitness for ind in y])
 
     scores = []
+    configurations = []
     for i in range(samples):
         configuration = {k: np.random.uniform(*v) for k, v in kwargs.items()}
         config_scores = [run(**configuration) for _ in range(tests_per_sample)]
 
-        score = delayed(lambda x: (np.mean(x), configuration))(config_scores)
+        score = delayed(np.mean)(config_scores)
         scores.append(score)
-    return client.gather(client.compute(scores))
+        configurations.append(configuration)
+        scores = client.gather(client.compute(scores))
+    return scores, configurations
 

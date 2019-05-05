@@ -3,3 +3,4 @@ numpy
 toolz
 dask
 distributed
+dask_jobqueue
