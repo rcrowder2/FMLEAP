@@ -38,6 +38,13 @@ class CGPExecutable(Executable):
             node_inputs = [ n['output'] for n in in_nodes ]
             self.graph.nodes[i]['output'] = f(*node_inputs)
 
+        result = []
+        for i in range(self.num_inputs + num_hidden, self.num_inputs + num_hidden + self.num_outputs):
+            in_edges = self.graph.in_edges(i)
+            assert(len(in_edges) == 1), f"CGP output node {i} is connected to {len(in_edges)} nodes, but must be connected to exactly 1."
+            self.graph.nodes[i]['output'] = in_edges[0]['output']
+
+        
         # TODO output nodes
 
 
