@@ -13,7 +13,7 @@ def test_num_genes1():
     decoder = cgp.CGPDecoder(primitives=[lambda x: not x], num_inputs=1, num_outputs=1, num_layers=1, nodes_per_layer=1, max_arity=1)
     assert(3 == decoder.num_genes())
 
-s
+
 def test_decode1():
     """A linear genome with just one input, node, and output, should yield a
     graph connected all three."""
