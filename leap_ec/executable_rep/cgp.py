@@ -22,37 +22,50 @@ class CGPExecutable(Executable):
         self.num_outputs = num_outputs
         self.graph = graph
 
-    def __call__(self, inputs):
-        assert(len(inputs) == self.num_inputs)
+    def __call__(self, *args):
+        assert(len(args) == self.num_inputs)
 
         # Assign the input values
         for i in range(self.num_inputs):
-            self.graph.nodes[i]['output'] = inputs[i]
+            self.graph.nodes[i]['output'] = args[i]
         
         # Compute the values of hidden nodes, going in order so preprequisites are computed first
         num_hidden = len(self.graph.nodes) - self.num_inputs - self.num_outputs
         for i in range(self.num_inputs, self.num_inputs + num_hidden):
             f = self.graph.nodes[i]['function']
             in_edges = self.graph.in_edges(i)
-            in_nodes = [ e[0] for e in in_edges ]
+            in_nodes = [ self.graph.nodes[e[0]] for e in in_edges ]
             node_inputs = [ n['output'] for n in in_nodes ]
             self.graph.nodes[i]['output'] = f(*node_inputs)
 
+        # Copy the output values into their nodes
         result = []
         for i in range(self.num_inputs + num_hidden, self.num_inputs + num_hidden + self.num_outputs):
-            in_edges = self.graph.in_edges(i)
+            in_edges = list(self.graph.in_edges(i))
+            # FIXME Need to sort inputs by which "port" they are supposed to feed into
             assert(len(in_edges) == 1), f"CGP output node {i} is connected to {len(in_edges)} nodes, but must be connected to exactly 1."
-            self.graph.nodes[i]['output'] = in_edges[0]['output']
+            in_node = self.graph.nodes[in_edges[0][0]]
+            oi = in_node['output']
+            self.graph.nodes[i]['output'] = oi
+            result.append(oi)
 
-        
-        # TODO output nodes
+        return result
 
 
 ##############################
 # Class CGPDecoder
 ##############################
 class CGPDecoder(Decoder):
-    """Implements the genotype-phenotype decoding for Cartesian genetic programming (CGP)."""
+    """Implements the genotype-phenotype decoding for Cartesian genetic programming (CGP).
+    
+    A CGP genome is linear, but made up of one sub-sequence for each circuit elements.  In our
+    version here, the first gene in each sub-sequence indicates the primitive (i.e., function) that node computes, 
+    and the subsequence genes indicate the inputs to that primitive.
+    
+    For example, the sequence `[ 0, 2, 3 ]` indicates an element that computes the 0th primitive
+    (as an index of the `primitives` list) and takes its inputs from nodes 2 and 3, respectively.
+    
+    """
 
     def __init__(self, primitives, num_inputs, num_outputs, num_layers, nodes_per_layer, max_arity, levels_back=None):
         assert(primitives is not None)
@@ -136,6 +149,7 @@ class CGPDecoder(Decoder):
                 graph.nodes[node_id]['function'] = self.get_primitive(genome, layer, node)
                 inputs = self.get_input_sources(genome, layer, node)
                 graph.add_edges_from([(i, node_id) for i in inputs])
+                # FIXME Need to add attributes indicating which input each edge feeds into on the target node
 
         # Add edges connecting outputs to their sources
         output_sources = self.get_output_sources(genome)
