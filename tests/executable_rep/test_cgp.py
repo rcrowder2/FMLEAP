@@ -51,6 +51,9 @@ def test_2layer_phenome():
 def test_decode2(test_2layer_phenome):
     """When primitives have arity > 1, the edges of the decoded graph should have an `order` 
     attribute that correctly indicates which input the feed to on the destination node."""
+    assert(test_2layer_phenome.num_inputs == 2)
+    assert(test_2layer_phenome.num_outputs == 1)
+
     graph = test_2layer_phenome.graph
 
     assert(7 == graph.number_of_nodes())
@@ -68,15 +71,14 @@ def test_decode2(test_2layer_phenome):
     for i in [2, 3, 4, 5]:
         assert(2 == len(list(graph.in_edges(i))))
 
-    # Each output node takes only one input
-    for i in [6, 7]:
-        assert(1 == len(list(graph.in_edges(i))))
+    # The output node takes only one input
+    assert(1 == len(list(graph.in_edges(6))))
 
     # Check that the edges are feeding into the correct ports
-    graph.edges[0, 2]['order'] = 0  # Input 0 feeds into the 0th port of node 2
-    graph.edges[1, 2]['order'] = 1  # Input 1 feeds into the 1st port of node 2
-    graph.edges[0, 3]['order'] = 1  # Input 0 feeds into the 1st port of node 3
-    graph.edges[1, 3]['order'] = 0  # Input 1 feeds into the 0th port of node 3
+    assert(graph.edges[0, 2]['order'] == 0)  # Input 0 feeds into the 0th port of node 2
+    assert(graph.edges[1, 2]['order'] == 1)  # Input 1 feeds into the 1st port of node 2
+    assert(graph.edges[0, 3]['order'] == 1)  # Input 0 feeds into the 1st port of node 3
+    assert(graph.edges[1, 3]['order'] == 0)  # Input 1 feeds into the 0th port of node 3
 
 
 ##############################
@@ -93,13 +95,13 @@ def tt_inputs():
 
 def test_call1(test_2layer_phenome, tt_inputs):
     """The test individuals should compute the AND function."""
-    assert(test_ind.num_inputs == test_ind.num_inputs)
-    assert(test_ind.num_outputs == test_ind.num_outputs)
+    assert(test_2layer_phenome.num_inputs == 2)
+    assert(test_2layer_phenome.num_outputs == 1)
 
     # Truth table for AND
-    expected = [ True, False, False, False ]
+    expected = [ [True], [False], [False], [False] ]
 
-    result = [ test_ind(*in_vals) for in_vals in tt_inputs ]
+    result = [ test_2layer_phenome(*in_vals) for in_vals in tt_inputs ]
 
     assert(expected == result)
 

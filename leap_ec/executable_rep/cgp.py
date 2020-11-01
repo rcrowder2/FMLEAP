@@ -25,6 +25,16 @@ class CGPExecutable(Executable):
     def __call__(self, *args):
         assert(len(args) == self.num_inputs)
 
+        def get_sorted_input_nodes(node_id):
+            """Pull all the nodes that feed into a given node, ordered by the
+            port they feed into on the target node."""
+            in_edges = list(self.graph.in_edges(node_id, data='order'))
+            # Sort inputs by which "port" they are supposed to feed into
+            in_edges = sorted(in_edges, key=lambda e: e[2])  # Element 2 is the 'order' attribute
+            in_nodes = [ self.graph.nodes[e[0]] for e in in_edges ]
+            return in_nodes
+
+
         # Assign the input values
         for i in range(self.num_inputs):
             self.graph.nodes[i]['output'] = args[i]
@@ -33,8 +43,7 @@ class CGPExecutable(Executable):
         num_hidden = len(self.graph.nodes) - self.num_inputs - self.num_outputs
         for i in range(self.num_inputs, self.num_inputs + num_hidden):
             f = self.graph.nodes[i]['function']
-            in_edges = self.graph.in_edges(i)
-            in_nodes = [ self.graph.nodes[e[0]] for e in in_edges ]
+            in_nodes = get_sorted_input_nodes(i)
             node_inputs = [ n['output'] for n in in_nodes ]
             self.graph.nodes[i]['output'] = f(*node_inputs)
 
@@ -42,8 +51,6 @@ class CGPExecutable(Executable):
         result = []
         for i in range(self.num_inputs + num_hidden, self.num_inputs + num_hidden + self.num_outputs):
             in_edges = list(self.graph.in_edges(i))
-            # Sort inputs by which "port" they are supposed to feed into
-            in_edges = sorted(in_edges, key=lambda e: e['order'])
             assert(len(in_edges) == 1), f"CGP output node {i} is connected to {len(in_edges)} nodes, but must be connected to exactly 1."
             in_node = self.graph.nodes[in_edges[0][0]]
             oi = in_node['output']
@@ -100,7 +107,8 @@ class CGPDecoder(Decoder):
         assert(layer < self.num_layers)
         assert(node >= 0)
         assert(node < self.nodes_per_layer)
-        primitive_id = (layer*self.nodes_per_layer + node)*(self.max_arity + 1)
+        primitive_id = genome[(layer*self.nodes_per_layer + node)*(self.max_arity + 1)]
+        assert(primitive_id < len(self.primitives)), f"The gene for node {node} of layer {layer} specifies a primitive function id {primitive_id}, but that's out of range: we only have {len(self.primitives)} primitive(s)!"
         return self.primitives[primitive_id]
     
 
@@ -146,12 +154,12 @@ class CGPDecoder(Decoder):
         # Add edges connecting interior nodes to their sources
         for layer in range(self.num_layers):
             for node in range(self.nodes_per_layer):
-                # TODO Miller uses a pre-processing algorithm to omit nodes that are disconnected from the circuit (making execution more efficient)
+                # TODO Consider using Miller's pre-processing algorithm here to omit nodes that are disconnected from the circuit (making execution more efficient)
                 node_id = self.num_inputs + layer*self.nodes_per_layer + node
                 graph.nodes[node_id]['function'] = self.get_primitive(genome, layer, node)
                 inputs = self.get_input_sources(genome, layer, node)
-                graph.add_edges_from([(i, node_id) for i in inputs],
-                                     attr_dict={ 'order': i for i in inputs })
+                # Mark each edge with an 'order' attribute so we know which port they feed into on the target node
+                graph.add_edges_from([(i, node_id, {'order': o}) for o, i in enumerate(inputs)])
 
         # Add edges connecting outputs to their sources
         output_sources = self.get_output_sources(genome)
