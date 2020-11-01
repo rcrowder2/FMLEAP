@@ -26,35 +26,62 @@ def test_decode1():
     assert(phenome.graph.has_edge(0, 1))
     assert(phenome.graph.has_edge(1, 2))
 
-def test_decode2():
-    """When primitives have arity > 1, the edges of the decoded graph should have a `input_order` 
-    attribute that correctly indicates which input the feed to on the destination node."""
-    assert(False), "TODO"
 
-
-##############################
-# Tests for CGPExecutable
-##############################
 @pytest.fixture
-def test_ind():
+def test_2layer_phenome():
     """A simple CGP circuit that computes AND and is made up of four NAND gates."""
     nand = lambda x, y: not (x and y)
     primitives = [ nand ]
-    genome = [ 0, 0, 1,
-               0, 0, 1,
-               0, 2, 3,
-               0, 2, 3 ]
+    genome = [ 0, 0, 1,  # Node 2
+               0, 1, 0,  # Node 3
+               0, 2, 3,  # Node 4
+               0, 3, 2,  # Node 5
+               5 ]  # Output is node 5
 
     decoder = cgp.CGPDecoder(primitives=primitives,
                              num_inputs=2,
                              num_outputs=1,
-                             num_layers=1,
-                             nodes_per_layer=1,
+                             num_layers=2,
+                             nodes_per_layer=2,
                              max_arity=2)
     
     return decoder.decode(genome)
 
 
+def test_decode2(test_2layer_phenome):
+    """When primitives have arity > 1, the edges of the decoded graph should have an `order` 
+    attribute that correctly indicates which input the feed to on the destination node."""
+    graph = test_2layer_phenome.graph
+
+    assert(7 == graph.number_of_nodes())
+    assert(9 == graph.number_of_edges())
+    assert(graph.has_edge(0, 2))
+    assert(graph.has_edge(1, 2))
+    assert(graph.has_edge(0, 3))
+    assert(graph.has_edge(1, 3))
+    assert(graph.has_edge(2, 4))
+    assert(graph.has_edge(3, 4))
+    assert(graph.has_edge(2, 5))
+    assert(graph.has_edge(3, 5))
+
+    # Each internal node should have arity of 2
+    for i in [2, 3, 4, 5]:
+        assert(2 == len(list(graph.in_edges(i))))
+
+    # Each output node takes only one input
+    for i in [6, 7]:
+        assert(1 == len(list(graph.in_edges(i))))
+
+    # Check that the edges are feeding into the correct ports
+    graph.edges[0, 2]['order'] = 0  # Input 0 feeds into the 0th port of node 2
+    graph.edges[1, 2]['order'] = 1  # Input 1 feeds into the 1st port of node 2
+    graph.edges[0, 3]['order'] = 1  # Input 0 feeds into the 1st port of node 3
+    graph.edges[1, 3]['order'] = 0  # Input 1 feeds into the 0th port of node 3
+
+
+##############################
+# Tests for CGPExecutable
+##############################
 @pytest.fixture
 def tt_inputs():
     """Returns the 4 permutations of Boolean inputs for a 2-input truth table."""
@@ -64,7 +91,7 @@ def tt_inputs():
              [ False, False ] ]
 
 
-def test_call1(test_ind, tt_inputs):
+def test_call1(test_2layer_phenome, tt_inputs):
     """The test individuals should compute the AND function."""
     assert(test_ind.num_inputs == test_ind.num_inputs)
     assert(test_ind.num_outputs == test_ind.num_outputs)

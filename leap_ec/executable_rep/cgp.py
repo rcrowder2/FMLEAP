@@ -42,7 +42,8 @@ class CGPExecutable(Executable):
         result = []
         for i in range(self.num_inputs + num_hidden, self.num_inputs + num_hidden + self.num_outputs):
             in_edges = list(self.graph.in_edges(i))
-            # FIXME Need to sort inputs by which "port" they are supposed to feed into
+            # Sort inputs by which "port" they are supposed to feed into
+            in_edges = sorted(in_edges, key=lambda e: e['order'])
             assert(len(in_edges) == 1), f"CGP output node {i} is connected to {len(in_edges)} nodes, but must be connected to exactly 1."
             in_node = self.graph.nodes[in_edges[0][0]]
             oi = in_node['output']
@@ -136,6 +137,7 @@ class CGPDecoder(Decoder):
     def decode(self, genome):
         """Decode a linear CGP genome into an executable circuit."""
         assert(genome is not None)
+        assert(len(genome) == self.num_genes()), f"Expected a genome of length {self.num_genes()}, but was given one of length {len(genome)}."
         all_node_ids = [i for i in range(self.num_cgp_nodes())]
 
         graph = nx.DiGraph()
@@ -148,8 +150,8 @@ class CGPDecoder(Decoder):
                 node_id = self.num_inputs + layer*self.nodes_per_layer + node
                 graph.nodes[node_id]['function'] = self.get_primitive(genome, layer, node)
                 inputs = self.get_input_sources(genome, layer, node)
-                graph.add_edges_from([(i, node_id) for i in inputs])
-                # FIXME Need to add attributes indicating which input each edge feeds into on the target node
+                graph.add_edges_from([(i, node_id) for i in inputs],
+                                     attr_dict={ 'order': i for i in inputs })
 
         # Add edges connecting outputs to their sources
         output_sources = self.get_output_sources(genome)
