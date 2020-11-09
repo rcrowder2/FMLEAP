@@ -4,6 +4,7 @@ import toolz
 
 from leap_ec.decoder import Decoder
 from leap_ec import ops
+from leap_ec.int_rep.initializers import create_int_vector
 from .executable import Executable
 
 
@@ -163,8 +164,8 @@ class CGPDecoder(Decoder):
         output_sources = genome[first_output:]
         return output_sources
 
-    def min_bounds(self):
-        """Return the minimum allowed value they every gene may assume, taking into account the levels_back parameteretc.
+    def _min_bounds(self):
+        """Return the minimum allowed value they every gene may assume, taking into account the levels_back parameter, etc.
 
         These values should be used by initialization and mutation operators to ensure that CGP's constraints are met.
 
@@ -177,7 +178,7 @@ class CGPDecoder(Decoder):
         nodes that feed into it).
         
         >>> decoder = CGPDecoder([sum], num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
-        >>> decoder.min_bounds()
+        >>> decoder._min_bounds()
         [0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 2, 2, 0, 0]
         """
         mins = []
@@ -190,7 +191,7 @@ class CGPDecoder(Decoder):
             else:  # Otherwise we can only connect to nodes that are within levels_back layers from this later
                 min_source_value_for_layer = self.num_inputs + (l - self.levels_back)*self.nodes_per_layer
 
-            # Assign min bounds for each node
+            # Assign min bounds for each node in this layer
             for _ in range(self.nodes_per_layer):
                 mins.append(0)  # The gene that defines the node's primitive
                 for _ in range(self.max_arity):  # The node's input sources
@@ -200,7 +201,50 @@ class CGPDecoder(Decoder):
         for _ in range(self.num_outputs):
             mins.append(0)
         return mins
+    
+    def _max_bounds(self):
+        """Return the maximum allowed value they every gene may assume, taking into account the levels structure.
+
+        These values should be used by initialization and mutation operators to ensure that CGP's constraints are met.
+
+        For example, in a 2x2 CGP grid with two inputs, nodes in the first layer can take inputs 
+        from up to node 1 (i.e., any of the input nodes), while nodes in the second layer take inputs from up to node
+        3 (i.e. any of inputs or nodes in layer 1).
+
+        This is expressed in the following max-bounds for each gene (recall that each node takes three genes
+        `[p_id, i_1, i_2]`, where `p_id` is the index of the node's primitive, and `i_1, i_2` are the indices of the
+        nodes that feed into it).
         
+        >>> decoder = CGPDecoder([sum, lambda x: x[0] - x[1]], num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
+        >>> decoder._max_bounds()
+        [2, 1, 1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 5, 5]
+        """
+        maxes = []
+
+        # Examine the nodes layer-by-layer
+        for l in range(self.num_layers):
+            # We can accept inputs from any node in an earlier layer than this one
+            max_source_value_for_layer = self.num_inputs - 1 + l*self.nodes_per_layer
+
+            # Assign max bounds for each node in this layer
+            for _ in range(self.nodes_per_layer):
+                maxes.append(len(self.primitives))  # The gene that defines the node's primitive
+                for _ in range(self.max_arity):  # The node's input sources
+                    maxes.append(max_source_value_for_layer)
+
+        # Outputs can connect to any node in the entire circuit, except for other outputs
+        for _ in range(self.num_outputs):
+            maxes.append(self.num_cgp_nodes() - 1 - self.num_outputs)
+        return maxes
+
+    def bounds(self):
+        """
+
+        >>> decoder = CGPDecoder([sum, lambda x: x[0] - x[1]], num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
+        >>> decoder.bounds()
+        [(0, 2), (0, 1), (0, 1), (0, 2), (0, 1), (0, 1), (0, 2), (2, 3), (2, 3), (0, 2), (2, 3), (2, 3), (0, 5), (0, 5)]
+        """
+        return list(zip(self._min_bounds(), self._max_bounds()))
 
     def decode(self, genome):
         """Decode a linear CGP genome into an executable circuit."""
@@ -230,7 +274,7 @@ class CGPDecoder(Decoder):
                 
 
 ##############################
-# Class CGPMutation
+# Function cgp_mutate
 ##############################
 @toolz.curry
 @ops.iteriter_op
@@ -238,3 +282,18 @@ def cgp_mutate(next_individual, cgp_decoder):
     """A special integer-vector mutation operator that respects the constraints on valid genomes
     that are implied by the parameters of the given CGPDecoder.
     """
+    assert(cgp_decoder is not None)
+    
+
+
+
+##############################
+# Function create_cgp_vector
+##############################
+def create_cgp_vector(cgp_decoder):
+    assert(cgp_decoder is not None)
+
+    def create():
+        return create_int_vector(cgp_decoder.bounds())
+
+    return create
