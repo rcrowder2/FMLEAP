@@ -49,20 +49,32 @@ def stochastic_chisquare(expected_distribution, distribution):
     return p_value
 
 
-def stochastic_equals(expected_distribution, distribution, p=0.001):
+def stochastic_equals(expected_distribution, observed_distribution, p=0.001):
     """Use a $\chi^2$ test to determine whether two discrete distributions are
     equal.
 
-    For example, the following tests whether a 6-sided die is unbiased:
+    For example, we do not reject the hypothesis that `[5060, 4940]` comes from a uniform
+    distribution:
+
+    >>> expected = { 0: 5000, 1: 5000 }
+    >>> observed = { 0: 5060, 1: 4940 }
+    >>> stochastic_equals(expected, observed)
+    True
+
+    Here we also do not reject the hypothesis that a 6-sided die is unbiased:
     
-    >>> expected_distribution = { 1: 10, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10}
-    >>> distribution = { 1: 5, 2: 8, 3: 9, 4: 8, 5: 10, 6: 20}
-    >>> stochastic_equals(expected_distribution, distribution)
+    >>> expected = { 1: 10, 2: 10, 3: 10, 4: 10, 5: 10, 6: 10}
+    >>> observed = { 1: 5, 2: 8, 3: 9, 4: 8, 5: 10, 6: 20}
+    >>> stochastic_equals(expected, observed)
+    True
+
+    But we would have if we used a 95% significant level instead of the default 99%:
+    >>> stochastic_equals(expected, observed, p=0.05)
     False
     
     """
-    p_value = stochastic_chisquare(expected_distribution, distribution)
-    return p_value <= p
+    p_value = stochastic_chisquare(expected_distribution, observed_distribution)
+    return p_value > p
 
 
 
