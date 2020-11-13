@@ -1,3 +1,4 @@
+"""Unit tests for initializers in the integer representation package."""
 from collections import Counter
 
 import pytest

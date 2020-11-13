@@ -26,7 +26,10 @@ def mutate_randint(next_individual: Iterator, bounds,
     >>> mutated = next(operator(population))
     """
     while True:
-        individual = next(next_individual)
+        try:
+            individual = next(next_individual)
+        except StopIteration:
+            return
 
         individual.genome = individual_mutate_randint(individual.genome, bounds,
                                                    expected_num_mutations=expected_num_mutations)
