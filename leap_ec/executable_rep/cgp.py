@@ -1,10 +1,13 @@
 """Cartesian genetic programming (CGP) representation."""
+from typing import Iterator
+
 import networkx as nx
 import toolz
 
 from leap_ec.decoder import Decoder
 from leap_ec import ops
 from leap_ec.int_rep.initializers import create_int_vector
+from leap_ec.int_rep.ops import mutate_randint
 from .executable import Executable
 
 
@@ -94,7 +97,7 @@ class CGPDecoder(Decoder):
         self.num_layers = num_layers
         self.nodes_per_layer = nodes_per_layer
         self.max_arity = max_arity
-        self.levels_back = levels_back
+        self.levels_back = levels_back if levels_back is not None else num_layers
 
     def num_genes(self):
         """The number of genes we expect to find in each genome.  This will equal the number of outputs plus the total number
@@ -215,7 +218,8 @@ class CGPDecoder(Decoder):
         `[p_id, i_1, i_2]`, where `p_id` is the index of the node's primitive, and `i_1, i_2` are the indices of the
         nodes that feed into it).
         
-        >>> decoder = CGPDecoder([sum, lambda x: x[0] - x[1]], num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
+        >>> primitives = [ sum, lambda x: x[0] - x[1], lambda x: x[0] * x[1] ]
+        >>> decoder = CGPDecoder(primitives, num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
         >>> decoder._max_bounds()
         [2, 1, 1, 2, 1, 1, 2, 3, 3, 2, 3, 3, 5, 5]
         """
@@ -228,7 +232,7 @@ class CGPDecoder(Decoder):
 
             # Assign max bounds for each node in this layer
             for _ in range(self.nodes_per_layer):
-                maxes.append(len(self.primitives))  # The gene that defines the node's primitive
+                maxes.append(len(self.primitives) - 1)  # The gene that defines the node's primitive
                 for _ in range(self.max_arity):  # The node's input sources
                     maxes.append(max_source_value_for_layer)
 
@@ -240,7 +244,8 @@ class CGPDecoder(Decoder):
     def bounds(self):
         """
 
-        >>> decoder = CGPDecoder([sum, lambda x: x[0] - x[1]], num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
+        >>> primitives = [ sum, lambda x: x[0] - x[1], lambda x: x[0] * x[1] ]
+        >>> decoder = CGPDecoder(primitives, num_inputs=2, num_outputs=2, num_layers=2, nodes_per_layer=2, max_arity=2, levels_back=1)
         >>> decoder.bounds()
         [(0, 2), (0, 1), (0, 1), (0, 2), (0, 1), (0, 1), (0, 2), (2, 3), (2, 3), (0, 2), (2, 3), (2, 3), (0, 5), (0, 5)]
         """
@@ -276,14 +281,20 @@ class CGPDecoder(Decoder):
 ##############################
 # Function cgp_mutate
 ##############################
-@toolz.curry
-@ops.iteriter_op
-def cgp_mutate(next_individual, cgp_decoder):
+def cgp_mutate(cgp_decoder,
+                   expected_num_mutations: float = 1):
     """A special integer-vector mutation operator that respects the constraints on valid genomes
     that are implied by the parameters of the given CGPDecoder.
     """
     assert(cgp_decoder is not None)
     
+    mutator = mutate_randint(bounds=cgp_decoder.bounds(), expected_num_mutations=expected_num_mutations)
+
+    @ops.iteriter_op
+    def mutate(next_individual: Iterator):
+        return mutator(next_individual)
+    
+    return mutate
 
 
 
