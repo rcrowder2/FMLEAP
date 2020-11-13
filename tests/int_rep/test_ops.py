@@ -52,3 +52,42 @@ def test_mutate_randint1():
     assert(stat.stochastic_equals(expected_ind0_gene1, ind0_gene1_counts))
     assert(stat.stochastic_equals(expected_ind1_gene0, ind1_gene0_counts))
     assert(stat.stochastic_equals(expected_ind1_gene1, ind1_gene1_counts))
+
+
+@pytest.mark.stochastic
+def test_mutate_randint2():
+    """If we set the expected number of mutations to 2 when our genomes have
+     only 2 genes, then each gene is always mutated, meaning individuals are
+     completely resampled from a uniform distribution."""
+
+    N = 1000
+
+    ind0_gene0_values = []
+    ind0_gene1_values = []
+    ind1_gene0_values = []
+    ind1_gene1_values = []
+
+    for _ in range(N):
+        ind1 = Individual([0, 0])
+        ind2 = Individual([1, 1])
+        population = iter([ind1, ind2])
+
+        result = ops.mutate_randint(population, bounds=[(0, 1), (0, 1)], expected_num_mutations=2)
+        result = list(result)  # Pulse the iterator
+
+        ind0_gene0_values.append(result[0].genome[0])
+        ind0_gene1_values.append(result[0].genome[1])
+        ind1_gene0_values.append(result[1].genome[0])
+        ind1_gene1_values.append(result[1].genome[1])
+
+    ind0_gene0_counts = Counter(ind0_gene0_values)
+    ind0_gene1_counts = Counter(ind0_gene1_values)
+    ind1_gene0_counts = Counter(ind1_gene0_values)
+    ind1_gene1_counts = Counter(ind1_gene1_values)
+
+    expected = { 0: 0.5*N, 1: 0.5*N }
+
+    assert(stat.stochastic_equals(expected, ind0_gene0_counts))
+    assert(stat.stochastic_equals(expected, ind0_gene1_counts))
+    assert(stat.stochastic_equals(expected, ind1_gene0_counts))
+    assert(stat.stochastic_equals(expected, ind1_gene1_counts))
