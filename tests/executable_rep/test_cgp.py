@@ -109,9 +109,33 @@ def test_call1(test_2layer_circuit, tt_inputs):
     # Truth table for AND
     expected = [ [True], [False], [False], [False] ]
 
-    result = [ phenome(*in_vals) for in_vals in tt_inputs ]
+    result = [ phenome(in_vals) for in_vals in tt_inputs ]
 
     assert(expected == result)
+
+
+def test_call2(tt_inputs):
+    """A circuit with an element that takes two inputs from the same input
+    source should execut with no issues (this checks to make sure we support
+    multiple edges between the same two nodes)."""
+    genome = [0, 1, 1, 1, 0, 0, 1]
+
+    cgp_decoder = cgp.CGPDecoder(
+                        primitives=[
+                            lambda x, y: not (x and y),  # NAND
+                            lambda x, y: not x,  # NOT (ignoring y)
+                        ],
+                        num_inputs = 2,
+                        num_outputs = 1,
+                        num_layers=1,
+                        nodes_per_layer=2,
+                        max_arity=2
+                    )
+
+    phenome = cgp_decoder.decode(genome)
+
+    result = [ phenome(in_vals) for in_vals in tt_inputs ]
+
 
 
 ##############################

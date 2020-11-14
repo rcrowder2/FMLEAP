@@ -3,9 +3,9 @@ import numpy as np
 from leap_ec.real_rep.problems import ScalarProblem
 
 ##############################
-# Class ExecutableProblem
+# Class EnvironmentProblem
 ##############################
-class ExecutableProblem(ScalarProblem):
+class EnvironmentProblem(ScalarProblem):
     """Defines a fitness function over :class:`~leap_ec.executable.phenotype.Executable` by 
     evaluating them within a given environment.
     
@@ -29,9 +29,9 @@ class ExecutableProblem(ScalarProblem):
         self.stop_on_done = stop_on_done
         self.gui = gui
         if fitness_type == 'reward':
-            self.fitness = ExecutableProblem._reward_fitness
+            self.fitness = EnvironmentProblem._reward_fitness
         elif fitness_type == 'survival':
-            self.fitness = ExecutableProblem._survival_fitness
+            self.fitness = EnvironmentProblem._survival_fitness
         else:
             raise ValueError(f"Unrecognized fitness type: '{fitness_type}'")
 
@@ -73,7 +73,68 @@ class ExecutableProblem(ScalarProblem):
 # Class TruthTableProblem
 ##############################
 class TruthTableProblem(ScalarProblem):
-    """"""
-    def __init__(self, boolean_function):
+    """Defines a fitness function over a :class:`~leap_ec.executable.phenotype.Executable` by 
+    evaluating it against each row of a given Boolean function's truth table."""
+
+    def __init__(self, boolean_function, num_inputs, num_outputs):
         assert(boolean_function is not None)
         assert(callable(boolean_function))
+        assert(num_inputs > 0)
+        assert(num_outputs > 0)
+        self.function = boolean_function
+        self.num_inputs = num_inputs
+        self.num_outputs = num_outputs
+
+    def evaluate(self, executable):
+        """
+        For example, say our object function is $(x_0 \wedge x_1) \vee x_3$:
+
+        >>> problem = TruthTableProblem(lambda x: (x[0] and x[1]) or x[2], num_inputs=3, num_outputs=1)
+
+        The truth table for this Boolean function has eight entries:
+
+        F F F=F
+        F F T=T
+        F T F=F
+        F T T=T
+        T F F=F
+        T F T=T
+        T T F=T
+        T T T=T
+
+        Now consider a different function, $(x_0 \wedge x_1) \oplus x_3$.
+        
+        >>> executable = lambda x: (x[0] and x[1]) ^ x[2]
+
+        This function's truth table differs from the first one by exactly one
+        entry (in the second one, TTT=F).  So we expect a fitness value of 
+        $7/8 = 0.875$:
+        
+        >>> problem.evaluate(executable)
+        0.875
+
+        """
+        assert(executable is not None)
+        assert(callable(executable))
+        input_samples = self._enumerate_tt(self.num_inputs)
+
+        score = 0
+        for input_ in input_samples:
+            if executable(input_) == self.function(input_):
+                score += 1
+
+        return score/len(input_samples)
+
+    @staticmethod
+    def _enumerate_tt(num_inputs):
+        """Generate input permutations for a complex truth table."""
+        # TODO Rewriting this as a generator function would save a lot of memory on big tables.
+        assert(num_inputs > 0)
+        if num_inputs == 1:
+            return [[0], [1]]
+        else:
+            tt_minus_1 = TruthTableProblem._enumerate_tt(num_inputs - 1)
+            zeros = [ [0] + row for row in tt_minus_1 ]
+            ones = [ [1] + row for row in tt_minus_1 ]
+            return zeros + ones
+
