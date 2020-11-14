@@ -67,3 +67,13 @@ class ExecutableProblem(ScalarProblem):
             observations.append(run_observations)
             rewards.append(run_rewards)
         return self.fitness(observations, rewards)
+
+
+##############################
+# Class TruthTableProblem
+##############################
+class TruthTableProblem(ScalarProblem):
+    """"""
+    def __init__(self, boolean_function):
+        assert(boolean_function is not None)
+        assert(callable(boolean_function))
