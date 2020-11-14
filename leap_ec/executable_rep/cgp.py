@@ -28,8 +28,8 @@ class CGPExecutable(Executable):
         self.num_outputs = num_outputs
         self.graph = graph
 
-    def __call__(self, *args):
-        assert(len(args) == self.num_inputs)
+    def __call__(self, input_):
+        assert(len(input_) == self.num_inputs)
 
         def get_sorted_input_nodes(node_id):
             """Pull all the nodes that feed into a given node, ordered by the
@@ -43,7 +43,7 @@ class CGPExecutable(Executable):
 
         # Assign the input values
         for i in range(self.num_inputs):
-            self.graph.nodes[i]['output'] = args[i]
+            self.graph.nodes[i]['output'] = input_[i]
         
         # Compute the values of hidden nodes, going in order so preprequisites are computed first
         num_hidden = len(self.graph.nodes) - self.num_inputs - self.num_outputs
@@ -251,13 +251,13 @@ class CGPDecoder(Decoder):
         """
         return list(zip(self._min_bounds(), self._max_bounds()))
 
-    def decode(self, genome):
+    def decode(self, genome, *args, **kwargs):
         """Decode a linear CGP genome into an executable circuit."""
         assert(genome is not None)
         assert(len(genome) == self.num_genes()), f"Expected a genome of length {self.num_genes()}, but was given one of length {len(genome)}."
         all_node_ids = [i for i in range(self.num_cgp_nodes())]
 
-        graph = nx.DiGraph()
+        graph = nx.MultiDiGraph()
         graph.add_nodes_from(all_node_ids)
 
         # Add edges connecting interior nodes to their sources
@@ -305,6 +305,6 @@ def create_cgp_vector(cgp_decoder):
     assert(cgp_decoder is not None)
 
     def create():
-        return create_int_vector(cgp_decoder.bounds())
+        return create_int_vector(cgp_decoder.bounds())()
 
     return create

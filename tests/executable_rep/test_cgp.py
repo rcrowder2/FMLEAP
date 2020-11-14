@@ -56,7 +56,7 @@ def test_2layer_circuit():
 
 def test_decode2(test_2layer_circuit):
     """When primitives have arity > 1, the edges of the decoded graph should have an `order` 
-    attribute that correctly indicates which input the feed to on the destination node."""
+    attribute that correctly indicates which input they feed to on the destination node."""
     _, phenome, _ = test_2layer_circuit
     assert(phenome.num_inputs == 2)
     assert(phenome.num_outputs == 1)
@@ -82,10 +82,10 @@ def test_decode2(test_2layer_circuit):
     assert(1 == len(list(graph.in_edges(6))))
 
     # Check that the edges are feeding into the correct ports
-    assert(graph.edges[0, 2]['order'] == 0)  # Input 0 feeds into the 0th port of node 2
-    assert(graph.edges[1, 2]['order'] == 1)  # Input 1 feeds into the 1st port of node 2
-    assert(graph.edges[0, 3]['order'] == 1)  # Input 0 feeds into the 1st port of node 3
-    assert(graph.edges[1, 3]['order'] == 0)  # Input 1 feeds into the 0th port of node 3
+    assert(graph.edges[0, 2, 0]['order'] == 0)  # Input 0 feeds into the 0th port of node 2
+    assert(graph.edges[1, 2, 0]['order'] == 1)  # Input 1 feeds into the 1st port of node 2
+    assert(graph.edges[0, 3, 0]['order'] == 1)  # Input 0 feeds into the 1st port of node 3
+    assert(graph.edges[1, 3, 0]['order'] == 0)  # Input 1 feeds into the 0th port of node 3
 
 
 ##############################

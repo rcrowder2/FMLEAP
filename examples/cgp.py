@@ -20,13 +20,13 @@ if __name__ == '__main__':
                         ],
                         num_inputs = 2,
                         num_outputs = 1,
-                        num_layers=1,
-                        nodes_per_layer=20,
+                        num_layers=50,
+                        nodes_per_layer=1,
                         max_arity=2
                     )
 
     with open('./cgp_stats.csv', 'w') as log_stream:
-        ea = generational_ea(100, pop_size, 
+        ea = generational_ea(500, pop_size, 
 
                 representation=Representation(
                     decoder=cgp_decoder,
@@ -36,7 +36,7 @@ if __name__ == '__main__':
 
                 # Our fitness function will be to solve the XOR problem
                 problem=problems.TruthTableProblem(
-                    boolean_function=lambda x: x[0] ^ x[1],  # XOR
+                    boolean_function=lambda x: [ x[0] ^ x[1] ],  # XOR
                     num_inputs = 2,
                     num_outputs = 1
                 ),
@@ -45,6 +45,7 @@ if __name__ == '__main__':
                     ops.tournament_selection,
                     ops.clone,
                     cgp.cgp_mutate(cgp_decoder),
+                    ops.evaluate,
                     ops.pool(size=pop_size),
                     probe.FitnessStatsCSVProbe(context.context, stream=sys.stdout)
                 ]

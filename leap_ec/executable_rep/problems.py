@@ -74,9 +74,14 @@ class EnvironmentProblem(ScalarProblem):
 ##############################
 class TruthTableProblem(ScalarProblem):
     """Defines a fitness function over a :class:`~leap_ec.executable.phenotype.Executable` by 
-    evaluating it against each row of a given Boolean function's truth table."""
+    evaluating it against each row of a given Boolean function's truth table.
 
-    def __init__(self, boolean_function, num_inputs, num_outputs):
+    Both the executable we receive and the `boolean_function` we compare against should return 
+    a list of 1 or more outputs.
+    """
+
+    def __init__(self, boolean_function, num_inputs, num_outputs, maximize=True):
+        super().__init__(maximize)
         assert(boolean_function is not None)
         assert(callable(boolean_function))
         assert(num_inputs > 0)
@@ -87,9 +92,9 @@ class TruthTableProblem(ScalarProblem):
 
     def evaluate(self, executable):
         """
-        For example, say our object function is $(x_0 \wedge x_1) \vee x_3$:
+        Say our object function is $(x_0 \wedge x_1) \vee x_3$:
 
-        >>> problem = TruthTableProblem(lambda x: (x[0] and x[1]) or x[2], num_inputs=3, num_outputs=1)
+        >>> problem = TruthTableProblem(lambda x: [ (x[0] and x[1]) or x[2] ], num_inputs=3, num_outputs=1)
 
         The truth table for this Boolean function has eight entries:
 
@@ -104,7 +109,7 @@ class TruthTableProblem(ScalarProblem):
 
         Now consider a different function, $(x_0 \wedge x_1) \oplus x_3$.
         
-        >>> executable = lambda x: (x[0] and x[1]) ^ x[2]
+        >>> executable = lambda x: [ (x[0] and x[1]) ^ x[2] ]
 
         This function's truth table differs from the first one by exactly one
         entry (in the second one, TTT=F).  So we expect a fitness value of 
@@ -113,6 +118,14 @@ class TruthTableProblem(ScalarProblem):
         >>> problem.evaluate(executable)
         0.875
 
+        Note that we our lambda functions above return a list that contains a 
+        computed value, rather than just the value directly.  This is because
+        this framework allows us to work with functions of more than one output:
+
+        >>> problem = TruthTableProblem(lambda x: [ x[0] and x[1], x[0] or x[1] ], num_inputs=3, num_outputs=2)
+        >>> problem.evaluate(lambda x: [ x[0] and x[1], x[0] or x[1] ])
+        1.0
+
         """
         assert(executable is not None)
         assert(callable(executable))
@@ -120,7 +133,11 @@ class TruthTableProblem(ScalarProblem):
 
         score = 0
         for input_ in input_samples:
-            if executable(input_) == self.function(input_):
+            expected = self.function(input_)
+            assert(hasattr(expected, '__len__')), "The function given to a TruthTableProblem must return a list of outputs with length 1 or greater."
+            assert(len(expected) > 0), f"The function given to TruthTableProblem must return a list of outputs with length 1 or greater, but its length was {len(expected)}."
+            observed = executable(input_)
+            if observed == expected:
                 score += 1
 
         return score/len(input_samples)
