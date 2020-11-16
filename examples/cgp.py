@@ -70,7 +70,7 @@ def cli():
 # cgp command
 ##############################
 @cli.command(name='cgp')
-@click.option('--gens', default=500)
+@click.option('--gens', default=1000)
 def cgp_cmd(gens):
     """Use an evolutionary CGP approach to solve the XOR function."""
     pop_size = 5
@@ -99,7 +99,7 @@ def cgp_cmd(gens):
 # random command
 ##############################
 @cli.command('random')
-@click.option('--evals', default=2500)
+@click.option('--evals', default=5000)
 def random(evals):
     """Use random search over a CGP representation to solve the XOR function."""
     ea = random_search(evals, 
