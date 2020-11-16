@@ -1,54 +1,114 @@
-"""Example demonstrating the use of Cartesin genetic programming (CGP) to 
-evolve logic circuits to solve Boolean functions."""
+"""Example demonstrating the use of Cartesion genetic programming (CGP) to 
+evolve logic circuits to solve Boolean functions.
+
+This application provides both an evolutionary CGP solver, and an alternative
+random search algorithm, so that the two may be compared.
+"""
 import sys
 
-from leap_ec.algorithm import generational_ea
+import click
+
+from leap_ec.algorithm import generational_ea, random_search
 from leap_ec import ops, probe, context
 from leap_ec.representation import Representation
 from leap_ec.executable_rep import cgp, problems
 
-if __name__ == '__main__':
-    pop_size = 5
 
-    # The CGPDecoder is the heart of our CGP representation.
-    # We'll set it up first because it's needed as a parameter 
-    # to a few different components.
-    cgp_decoder = cgp.CGPDecoder(
-                        primitives=[
-                            lambda x, y: not (x and y),  # NAND
-                            lambda x, y: not x,  # NOT (ignoring y)
-                        ],
-                        num_inputs = 2,
-                        num_outputs = 1,
-                        num_layers=50,
-                        nodes_per_layer=1,
-                        max_arity=2
-                    )
 
-    with open('./cgp_stats.csv', 'w') as log_stream:
-        ea = generational_ea(500, pop_size, 
+##############################
+# CGP components
+##############################
 
-                representation=Representation(
-                    decoder=cgp_decoder,
-                    # We use a sepecial initializer that obeys the CGP constraints
-                    initialize=cgp.create_cgp_vector(cgp_decoder)
-                ),
+# The CGPDecoder is the heart of our CGP representation.
+# We'll set it up first because it's needed as a parameter 
+# to a few different components.
+cgp_decoder = cgp.CGPDecoder(
+                    primitives=[
+                        lambda x, y: not (x and y),  # NAND
+                        lambda x, y: not x,  # NOT (ignoring y)
+                    ],
+                    num_inputs = 2,
+                    num_outputs = 1,
+                    num_layers=50,
+                    nodes_per_layer=1,
+                    max_arity=2
+                )
 
-                # Our fitness function will be to solve the XOR problem
-                problem=problems.TruthTableProblem(
+xor_problem = problems.TruthTableProblem(
                     boolean_function=lambda x: [ x[0] ^ x[1] ],  # XOR
                     num_inputs = 2,
                     num_outputs = 1
-                ),
+                )
 
-                pipeline=[
-                    ops.tournament_selection,
-                    ops.clone,
-                    cgp.cgp_mutate(cgp_decoder),
-                    ops.evaluate,
-                    ops.pool(size=pop_size),
-                    probe.FitnessStatsCSVProbe(context.context, stream=sys.stdout)
-                ]
-        )
+cgp_representation = Representation(
+                        decoder=cgp_decoder,
+                        # We use a sepecial initializer that obeys the CGP constraints
+                        initialize=cgp.create_cgp_vector(cgp_decoder)
+                    )
 
-        list(ea)
+
+##############################
+# cli entry point
+##############################
+@click.group()
+def cli():
+    """Example of Cartesian Genetic Programming."""
+
+
+##############################
+# cgp command
+##############################
+@cli.command(name='cgp')
+@click.option('--gens', default=500)
+def cgp_cmd(gens):
+    """Use an evolutionary CGP approach to solve the XOR function."""
+    pop_size = 5
+
+    ea = generational_ea(gens, pop_size, 
+
+            representation=cgp_representation,
+
+            # Our fitness function will be to solve the XOR problem
+            problem=xor_problem,
+
+            pipeline=[
+                ops.tournament_selection,
+                ops.clone,
+                cgp.cgp_mutate(cgp_decoder),
+                ops.evaluate,
+                ops.pool(size=pop_size),
+                probe.FitnessStatsCSVProbe(context.context, stream=sys.stdout),
+                probe.PopulationPlotProbe(context.context, modulo=10)
+            ]
+    )
+
+    list(ea)
+
+
+##############################
+# random command
+##############################
+@cli.command('random')
+@click.option('--evals', default=2500)
+def random(evals):
+    """Use random search over a CGP representation to solve the XOR function."""
+    ea = random_search(evals, 
+            representation=cgp_representation,
+
+            # Our fitness function will be to solve the XOR problem
+            problem=xor_problem,
+
+            pipeline=[
+                probe.FitnessStatsCSVProbe(context.context, stream=sys.stdout),
+                probe.PopulationPlotProbe(context.context, modulo=10)
+            ]
+    )
+
+    list(ea)
+
+
+##############################
+# main
+##############################
+if __name__ == '__main__':
+    cli()
