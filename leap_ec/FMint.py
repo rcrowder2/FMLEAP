@@ -6,20 +6,10 @@ Created on Sat May  7 09:57:02 2022
 @author: robert
 """
 
-from scipy.optimize import minimize
 import numpy as np
 from numpy.linalg import eig
 from math import exp
 
-
-def booth(x):
-    x1 = x[0]
-    x2 = x[1]
-    
-    return (x1 + 2*x2 -7)**2 + (2*x1 + x2 -5)**2
-
-bnds = ((-10,10),(-10,10))
-res = minimize(booth, [5,-5], method='trust-constr',bounds=bnds)
 
 def FMinterpolation(x,genomes,FMs):
     
