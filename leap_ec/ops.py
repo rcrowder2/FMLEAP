@@ -613,7 +613,7 @@ def fmga_breeding(next_individual: Iterator,
         ub = np.max(phenomes,axis=0) + 0.1
         lb = np.min(phenomes,axis=0) - 0.1
         lb[lb<hard_bounds[0]] = hard_bounds[0]
-        ub[ub<hard_bounds[1]] = hard_bounds[1]
+        ub[ub>hard_bounds[1]] = hard_bounds[1]
         
         
         bnds = []
@@ -641,7 +641,7 @@ def fmga_breeding(next_individual: Iterator,
             if np.random.rand() < p_mut:
                 #TODO: implement hard bounds
                 mut = -1
-                while mut < 0:
+                while mut < hard_bounds[0] or mut > hard_bounds[1]:
                      mut = np.random.normal(child[i],stdv)
                 child[i] = mut
                 
