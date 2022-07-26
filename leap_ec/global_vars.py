@@ -11,4 +11,4 @@ context['leap']['distrib']['non_viable'] accumulates counts of non-viable
    individuals during distrib.eval_pool() and
    distrib.async_eval_pool() runs.
 """
-context = {'leap': {'distrib': {'non_viable': 0}}}
+context = {'leap': {'distrib': {'non_viable': 0}}, 'FMfailed': 0}
