@@ -600,7 +600,7 @@ def fmga_breeding(next_individual: Iterator,
     :param p_mut: probability of mutation if traditional breeding is used
     :param stdv: standard deviation use for gaussian mutation.
     """
-    from .FMint import FMinterpolation
+    
     
     def _fmga_breeding(ind1, ind2):
         
@@ -610,9 +610,11 @@ def fmga_breeding(next_individual: Iterator,
         
         x0 = np.mean(phenomes,axis=0)
         
-        ub = np.max(phenomes,axis=0) + 0.05
-        lb = np.min(phenomes,axis=0) - 0.05
+        ub = np.max(phenomes,axis=0) + 0.1
+        lb = np.min(phenomes,axis=0) - 0.1
         lb[lb<hard_bounds[0]] = hard_bounds[0]
+        ub[ub<hard_bounds[1]] = hard_bounds[1]
+        
         
         bnds = []
         for l,u in zip(lb,ub):
@@ -620,7 +622,7 @@ def fmga_breeding(next_individual: Iterator,
         
         child = ind1.clone()
         try:
-            res = minimize(FMinterpolation, x0, args=(genomes,FMs), method='trust-constr',bounds=tuple(bnds))
+            res = minimize(ind1.problem.FMinterpolation, x0, args=(genomes,FMs), method='trust-constr',bounds=tuple(bnds))
             
             if res.success:
                 child.genome, valid = np.array(res.x),True
