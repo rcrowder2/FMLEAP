@@ -629,7 +629,8 @@ def fmga_breeding(next_individual: Iterator,
             else:
                 valid = False
                 
-        except:
+        except Exception as e:
+            print(e)
             valid = False
             
         return child, valid
@@ -669,6 +670,7 @@ def fmga_breeding(next_individual: Iterator,
             valid = _check_duplicate(child)
         
         if not valid:
+            print('failed')
             context['FMfailed'][context['leap']['generation']] += 1
             child.genome = _traditional_breeding(parent1.genome, parent2.genome)
             
