@@ -101,6 +101,46 @@ def genome_mutate_gaussian(genome,
     return genome
 
 
+@curry
+@iteriter_op
+def mutate_uniform(next_individual: Iterator,                    
+                    hard_bounds,p_mut: float = 0.2) -> Iterator:
+
+    if p_mut < 0  or p_mut > 1:
+        raise ValueError("Mutation value must be a value from 0 to 1.")
+    while True:
+        individual = next(next_individual)
+
+        individual.genome = genome_mutate_uniform(individual.genome,
+                                                   p_mut,
+                                                   hard_bounds)
+        # invalidate fitness since we have new genome
+        individual.fitness = None
+
+        yield individual
+        
+        
+@curry
+def genome_mutate_uniform(genome,
+                           p_mut,
+                           hard_bounds: Tuple[float, float]):
+    
+    if not isinstance(genome, np.ndarray):
+        raise ValueError(("Expected genome to be a numpy array. "
+                          f"Got {type(genome)}."))
+        
+    p = p_mut
+
+    # select which indices to mutate at random
+    selector = np.random.choice([0, 1], size=genome.shape, p=(1 - p, p))
+    indices_to_mutate = np.nonzero(selector)[0]
+
+    genome[indices_to_mutate] = np.random.uniform(hard_bounds[0],hard_bounds[1],
+                                                 size=indices_to_mutate.shape[0])
+
+    
+
+    return genome
 ##############################
 # Function apply_hard_bounds
 ##############################
@@ -141,3 +181,4 @@ def apply_hard_bounds(genome, hard_bounds):
         high = [bound[1] for bound in hard_bounds]
 
     return np.clip(genome, a_min=low, a_max=high)
+
