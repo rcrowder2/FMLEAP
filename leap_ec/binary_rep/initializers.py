@@ -32,3 +32,10 @@ def create_binary_sequence(length):
         return np.random.choice([0, 1], size=(length,))
 
     return create
+
+def create_bounded_sequence(length,bounds):
+    
+    def create():
+        return np.random.choice([bounds[0],bounds[1]], size=(length,))
+        
+    return create
