@@ -5,6 +5,7 @@
 import numpy as np
 
 from leap_ec.individual import Individual
+from leap_ec.real_rep.ops import apply_hard_bounds
 
 ##############################
 # Closure create_binary_sequence
@@ -36,6 +37,16 @@ def create_binary_sequence(length):
 def create_bounded_sequence(length,bounds):
     
     def create():
+        # genome = np.random.choice([bounds[0],bounds[3]], size=(length,))
+        
+        # for i,gene in enumerate(genome):
+        #     if gene == bounds[0]:
+        #         genome[i] = np.random.uniform(bounds[0],bounds[1])
+        #     else:
+        #         genome[i] = np.random.uniform(bounds[2],bounds[3])
+        # # genome = np.random.normal(genome,0.03)
+        
+        # return apply_hard_bounds(genome, (bounds[0],bounds[3]))
         return np.random.choice([bounds[0],bounds[1]], size=(length,))
         
     return create
