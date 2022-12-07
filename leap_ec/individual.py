@@ -272,7 +272,7 @@ class RobustIndividual(Individual):
 ##############################
 
 
-class FmgaIndividual(Individual):
+class LibraryIndividual(Individual):
     
     """
         Represents a single solution to a `Problem` that uses fission matrices.
@@ -287,9 +287,11 @@ class FmgaIndividual(Individual):
         super().__init__(genome, decoder=decoder, problem = problem)
         
         self.k = None
-        self.f_dist = None
+        self.expected_k = None
+        self.fitness = None
+        self.expected_fitness = None
         self.FM = None
-        self.fitness = 1
+        
         
         
     def clone(self):
