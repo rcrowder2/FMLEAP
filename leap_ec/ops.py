@@ -988,6 +988,45 @@ def elitist_survival(offspring: List, parents: List, k: int = 1, key = None) -> 
 
 
 ##############################
+# Function elitist_survival
+##############################
+@curry
+@listlist_op
+def library_survival(offspring: List, parents: List, k: int = 1,
+                     best_frac: float = 0.75) -> List:
+    """
+    This pools together the elites from the parents with a mix of the best
+    predicted offspring and purely random offspring
+
+    :param offspring: list of created offpring, probably from pool()
+    :param parents: list of parents, usually the ones that offspring came from
+    :param k: how many elites from parents to keep. 0 for no elitism
+    :param frac_best: fraction of offspring selected by best prediction 
+    :param key: optional key criteria for selecting; e.g., can be used to impose
+        parsimony pressure
+        
+    :return: surviving population, which will be offspring with offspring
+        replaced by any superior parent elites
+    """
+    # Calculate the number of each type of offspring needed to create 
+    # population for next generation
+    population_size = len(parents)
+    offspring_size = population_size - k
+    best_size = int(best_frac*offspring_size)
+    rand_size = offspring_size - best_size
+    
+    # sort the offspring by best predicted fitness
+    offspring.sort(reverse = True)
+    
+    # Add the elites and best offspring to the population
+    population = list(toolz.itertoolz.topk(k, parents))
+    population.extend(offspring[:best_size])
+    
+    # Add the random offspring
+    population.extend(random.sample(offspring[best_size:], rand_size))
+    
+    return population
+##############################
 # Function tournament_selection
 ##############################
 @curry
