@@ -323,7 +323,7 @@ class LibraryIndividual(Individual):
             self.is_viable = False  # we could not complete an eval
         
         
-        return self.fitness, self.k, self.f_dist, self.FM
+        return self.fitness, self.k, self.FM
     
     def evaluate_imp(self):
         """ This is the evaluate 'implementation' called by
@@ -333,7 +333,36 @@ class LibraryIndividual(Individual):
             that of the given decoder.
         """
         
-        return self.problem.evaluate(self.decode(), self.fitness==None)
+        return self.problem.evaluate(self.decode())
+    
+    def pre_evaluate(self):
+        
+        """ Determine Individual's fitness and associated k_eff and fission
+        matrix with a surrogate model evaluation.
+        
+        :return: calculated fitness, k_eff, and fission matrix
+        """
+        
+        try:
+            self.fitness, self.k = self.pre_evaluate_imp()
+            self.is_viable = True  # we were able to evaluate
+        except Exception as e:
+            self.fitness = nan
+            self.exception = e
+            self.is_viable = False  # we could not complete an eval
+        
+        
+        return self.expected_fitness, self.expected_k
+    
+    def pre_evaluate_imp(self):
+        """ This is the evaluate 'implementation' called by
+            self.evaluate().   It's intended to be optionally over-ridden by
+            sub-classes to give an opportunity to pass in ancillary data to
+            the evaluate process either by tailoring the problem interface or
+            that of the given decoder.
+        """
+        
+        return self.problem.pre_evaluate(self.decode())
 
 
 
