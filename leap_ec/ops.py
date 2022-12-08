@@ -266,6 +266,25 @@ def evaluate(next_individual: Iterator) -> Iterator:
 # evaluate operator
 ##############################
 @curry
+@iteriter_op
+def pre_evaluate(next_individual: Iterator) -> Iterator:
+    """
+    Pre-evaluates the individual according to the Problem definition
+
+    :param next_individual: iterator pointing to next individual to be evaluated
+
+    :return: the evaluated individual
+    """
+    while True:
+        individual = next(next_individual)
+        individual.pre_evaluate()
+
+        yield individual
+    
+##############################
+# evaluate operator
+##############################
+@curry
 @listlist_op
 def grouped_evaluate(population: list, problem, max_individuals_per_chunk: int = None) -> list:
     """Evaluate the population by sending groups of multiple individuals to
@@ -1029,7 +1048,8 @@ def tournament_selection(population: list, k: int = 2, key = None, select_worst:
 @listiter_op
 def elitist_selection(population: list, k = None, key = None, indices = None) -> Iterator:
     """Returns an opertaor that selects two random individuals from k elite
-    individuals of the population.        
+    individuals of the population. Default number of elite individuals is 20% 
+    of the population      
     """
     
     assert((indices is None) or (isinstance(indices, list))), f"Only a list should be passed to elitist_selection() for indices, but received {indices}."
