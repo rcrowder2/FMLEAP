@@ -308,14 +308,14 @@ class LibraryIndividual(Individual):
         
     def evaluate(self):
         
-        """ Determine Individual's fitness and associated k_eff, fission distribution
-        and fission matrix
+        """ Determine Individual's fitness and associated k_eff and fission
+        matrix with a full evaluation.
         
-        :return: calculated fitness, k_eff, fission distribution and fission matrix
+        :return: calculated fitness, k_eff, and fission matrix
         """
         
         try:
-            self.fitness, self.k, self.f_dist, self.FM = self.evaluate_imp()
+            self.fitness, self.k, self.FM = self.evaluate_imp()
             self.is_viable = True  # we were able to evaluate
         except Exception as e:
             self.fitness = nan
