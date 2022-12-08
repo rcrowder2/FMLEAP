@@ -11,7 +11,7 @@
 import itertools
 import uuid
 
-from leap_ec.individual import RobustIndividual, FmgaIndividual
+from leap_ec.individual import RobustIndividual, LibraryIndividual
 
 
 class DistributedIndividual(RobustIndividual):
@@ -57,7 +57,7 @@ class DistributedIndividual(RobustIndividual):
         
         
         
-class FmgaDistributedIndividual(FmgaIndividual):
+class LibraryDistributedIndividual(LibraryIndividual):
     # Tracks unique birth ID for each newly created individual
     birth_id = itertools.count()
 
@@ -70,7 +70,7 @@ class FmgaDistributedIndividual(FmgaIndividual):
 
         self.uuid = uuid.uuid4()
 
-        self.birth_id = next(FmgaDistributedIndividual.birth_id)
+        self.birth_id = next(LibraryDistributedIndividual.birth_id)
 
         # These are set in evaluate.evaluate(), so these are just to inform
         # you that that function will set these variables.
