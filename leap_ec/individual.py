@@ -344,7 +344,7 @@ class LibraryIndividual(Individual):
         """
         
         try:
-            self.fitness, self.k = self.pre_evaluate_imp()
+            self.expected_fitness, self.expected_k = self.pre_evaluate_imp()
             self.is_viable = True  # we were able to evaluate
         except Exception as e:
             self.fitness = nan
@@ -363,6 +363,20 @@ class LibraryIndividual(Individual):
         """
         
         return self.problem.pre_evaluate(self.decode())
+    
+    def __lt__(self, other):
+        """
+        Will compare expected fitness is self.fitness is None. Otherwise
+        performs as Individual.__lt__
 
+       
+        """
+        if other is None:  # Always better than None
+            return False
+        
+        if self.fitness is None:
+            return self.problem.worse_than(self.expected_fitness, other.expected_fitness)
+        else:
+            return self.problem.worse_than(self.fitness, other.fitness)
 
 
