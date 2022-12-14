@@ -11,6 +11,7 @@ setup(
     name='leap_ec',
     version=__version__,
     packages=find_packages(),
+    scripts=['gremlinfm/gremlinfm.py'],
     license='Academic',
     author='Mark Coletti, Eric Scott, Jeff Bassett',
     author_email='mcoletti@gmail.com',
