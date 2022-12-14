@@ -1,0 +1,4 @@
+server:
+  port: 82
+log:
+  file: log2.txt

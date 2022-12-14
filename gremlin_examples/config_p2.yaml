@@ -1,0 +1,36 @@
+algorithm: lib
+
+run_id: 2
+
+standard_params:
+    pop_size: 10
+    k_elites: 2
+    crossover:
+        p_c: 0.4
+    mutation:
+        std: 0.2
+        p_mut: 0.1
+        hbs: (0,1)
+        
+    
+problem: problem.FmgaProblem2()
+
+representation: representation.P2Representation()
+
+pipeline:
+  - ops.elitist_selection(k=${standard_params.k_elites})
+  - ops.clone
+  - ops.uniform_crossover(p_swap=${standard_params.crossover.p_c})
+  - >
+      mutate_gaussian(std=${standard_params.mutation.std},
+      p_mut = ${standard_params.mutation.p_mut},
+      hard_bounds=${standard_params.mutation.hbs})
+      
+  - ops.pre_evaluate
+  - ops.pool(size=${library_params.offspring_size})
+  
+output:
+    filename: results/t${run_id}.pck
+    function: output.p3_output
+    
+train_nn_model: True

@@ -1,0 +1,148 @@
+<?xml version='1.0' encoding='utf-8'?>
+<geometry>
+  <cell id="0" material="0" region="241 -242 253 -254" universe="11" />
+  <cell id="1" material="void" region="242 -243 253 -254" universe="11" />
+  <cell id="2" material="void" region="243 -244 253 -254" universe="11" />
+  <cell id="3" material="3" region="244 -245 253 -254" universe="11" />
+  <cell id="4" material="4" region="245 -246 253 -254" universe="11" />
+  <cell id="5" material="5" region="246 -247 253 -254" universe="11" />
+  <cell id="6" material="void" region="247 -248 253 -254" universe="11" />
+  <cell id="7" material="7" region="248 -249 253 -254" universe="11" />
+  <cell id="8" material="8" region="249 -250 253 -254" universe="11" />
+  <cell id="9" material="9" region="250 -251 253 -254" universe="11" />
+  <cell id="10" material="10" region="251 -252 253 -254" universe="11" />
+  <cell id="11" material="11" region="241 -242 254 -255" universe="11" />
+  <cell id="12" material="12" region="242 -243 254 -255" universe="11" />
+  <cell id="13" material="void" region="243 -244 254 -255" universe="11" />
+  <cell id="14" material="void" region="244 -245 254 -255" universe="11" />
+  <cell id="15" material="15" region="245 -246 254 -255" universe="11" />
+  <cell id="16" material="16" region="246 -247 254 -255" universe="11" />
+  <cell id="17" material="void" region="247 -248 254 -255" universe="11" />
+  <cell id="18" material="18" region="248 -249 254 -255" universe="11" />
+  <cell id="19" material="void" region="249 -250 254 -255" universe="11" />
+  <cell id="20" material="20" region="250 -251 254 -255" universe="11" />
+  <cell id="21" material="void" region="251 -252 254 -255" universe="11" />
+  <cell id="22" material="void" region="241 -242 255 -256" universe="11" />
+  <cell id="23" material="23" region="242 -243 255 -256" universe="11" />
+  <cell id="24" material="void" region="243 -244 255 -256" universe="11" />
+  <cell id="25" material="25" region="244 -245 255 -256" universe="11" />
+  <cell id="26" material="26" region="245 -246 255 -256" universe="11" />
+  <cell id="27" material="27" region="246 -247 255 -256" universe="11" />
+  <cell id="28" material="void" region="247 -248 255 -256" universe="11" />
+  <cell id="29" material="29" region="248 -249 255 -256" universe="11" />
+  <cell id="30" material="void" region="249 -250 255 -256" universe="11" />
+  <cell id="31" material="void" region="250 -251 255 -256" universe="11" />
+  <cell id="32" material="void" region="251 -252 255 -256" universe="11" />
+  <cell id="33" material="void" region="241 -242 256 -257" universe="11" />
+  <cell id="34" material="34" region="242 -243 256 -257" universe="11" />
+  <cell id="35" material="35" region="243 -244 256 -257" universe="11" />
+  <cell id="36" material="36" region="244 -245 256 -257" universe="11" />
+  <cell id="37" material="37" region="245 -246 256 -257" universe="11" />
+  <cell id="38" material="void" region="246 -247 256 -257" universe="11" />
+  <cell id="39" material="void" region="247 -248 256 -257" universe="11" />
+  <cell id="40" material="void" region="248 -249 256 -257" universe="11" />
+  <cell id="41" material="void" region="249 -250 256 -257" universe="11" />
+  <cell id="42" material="42" region="250 -251 256 -257" universe="11" />
+  <cell id="43" material="43" region="251 -252 256 -257" universe="11" />
+  <cell id="44" material="44" region="241 -242 257 -258" universe="11" />
+  <cell id="45" material="45" region="242 -243 257 -258" universe="11" />
+  <cell id="46" material="void" region="243 -244 257 -258" universe="11" />
+  <cell id="47" material="void" region="244 -245 257 -258" universe="11" />
+  <cell id="48" material="void" region="245 -246 257 -258" universe="11" />
+  <cell id="49" material="49" region="246 -247 257 -258" universe="11" />
+  <cell id="50" material="50" region="247 -248 257 -258" universe="11" />
+  <cell id="51" material="51" region="248 -249 257 -258" universe="11" />
+  <cell id="52" material="52" region="249 -250 257 -258" universe="11" />
+  <cell id="53" material="void" region="250 -251 257 -258" universe="11" />
+  <cell id="54" material="void" region="251 -252 257 -258" universe="11" />
+  <cell id="55" material="void" region="241 -242 258 -259" universe="11" />
+  <cell id="56" material="56" region="242 -243 258 -259" universe="11" />
+  <cell id="57" material="void" region="243 -244 258 -259" universe="11" />
+  <cell id="58" material="58" region="244 -245 258 -259" universe="11" />
+  <cell id="59" material="void" region="245 -246 258 -259" universe="11" />
+  <cell id="60" material="60" region="246 -247 258 -259" universe="11" />
+  <cell id="61" material="61" region="247 -248 258 -259" universe="11" />
+  <cell id="62" material="void" region="248 -249 258 -259" universe="11" />
+  <cell id="63" material="void" region="249 -250 258 -259" universe="11" />
+  <cell id="64" material="void" region="250 -251 258 -259" universe="11" />
+  <cell id="65" material="void" region="251 -252 258 -259" universe="11" />
+  <cell id="66" material="void" region="241 -242 259 -260" universe="11" />
+  <cell id="67" material="void" region="242 -243 259 -260" universe="11" />
+  <cell id="68" material="68" region="243 -244 259 -260" universe="11" />
+  <cell id="69" material="69" region="244 -245 259 -260" universe="11" />
+  <cell id="70" material="void" region="245 -246 259 -260" universe="11" />
+  <cell id="71" material="71" region="246 -247 259 -260" universe="11" />
+  <cell id="72" material="void" region="247 -248 259 -260" universe="11" />
+  <cell id="73" material="73" region="248 -249 259 -260" universe="11" />
+  <cell id="74" material="74" region="249 -250 259 -260" universe="11" />
+  <cell id="75" material="75" region="250 -251 259 -260" universe="11" />
+  <cell id="76" material="76" region="251 -252 259 -260" universe="11" />
+  <cell id="77" material="77" region="241 -242 260 -261" universe="11" />
+  <cell id="78" material="void" region="242 -243 260 -261" universe="11" />
+  <cell id="79" material="79" region="243 -244 260 -261" universe="11" />
+  <cell id="80" material="80" region="244 -245 260 -261" universe="11" />
+  <cell id="81" material="81" region="245 -246 260 -261" universe="11" />
+  <cell id="82" material="82" region="246 -247 260 -261" universe="11" />
+  <cell id="83" material="void" region="247 -248 260 -261" universe="11" />
+  <cell id="84" material="void" region="248 -249 260 -261" universe="11" />
+  <cell id="85" material="85" region="249 -250 260 -261" universe="11" />
+  <cell id="86" material="86" region="250 -251 260 -261" universe="11" />
+  <cell id="87" material="void" region="251 -252 260 -261" universe="11" />
+  <cell id="88" material="void" region="241 -242 261 -262" universe="11" />
+  <cell id="89" material="void" region="242 -243 261 -262" universe="11" />
+  <cell id="90" material="90" region="243 -244 261 -262" universe="11" />
+  <cell id="91" material="91" region="244 -245 261 -262" universe="11" />
+  <cell id="92" material="92" region="245 -246 261 -262" universe="11" />
+  <cell id="93" material="93" region="246 -247 261 -262" universe="11" />
+  <cell id="94" material="void" region="247 -248 261 -262" universe="11" />
+  <cell id="95" material="95" region="248 -249 261 -262" universe="11" />
+  <cell id="96" material="96" region="249 -250 261 -262" universe="11" />
+  <cell id="97" material="97" region="250 -251 261 -262" universe="11" />
+  <cell id="98" material="void" region="251 -252 261 -262" universe="11" />
+  <cell id="99" material="99" region="241 -242 262 -263" universe="11" />
+  <cell id="100" material="void" region="242 -243 262 -263" universe="11" />
+  <cell id="101" material="void" region="243 -244 262 -263" universe="11" />
+  <cell id="102" material="void" region="244 -245 262 -263" universe="11" />
+  <cell id="103" material="103" region="245 -246 262 -263" universe="11" />
+  <cell id="104" material="void" region="246 -247 262 -263" universe="11" />
+  <cell id="105" material="void" region="247 -248 262 -263" universe="11" />
+  <cell id="106" material="void" region="248 -249 262 -263" universe="11" />
+  <cell id="107" material="107" region="249 -250 262 -263" universe="11" />
+  <cell id="108" material="108" region="250 -251 262 -263" universe="11" />
+  <cell id="109" material="109" region="251 -252 262 -263" universe="11" />
+  <cell id="110" material="void" region="241 -242 263 -264" universe="11" />
+  <cell id="111" material="void" region="242 -243 263 -264" universe="11" />
+  <cell id="112" material="void" region="243 -244 263 -264" universe="11" />
+  <cell id="113" material="113" region="244 -245 263 -264" universe="11" />
+  <cell id="114" material="114" region="245 -246 263 -264" universe="11" />
+  <cell id="115" material="void" region="246 -247 263 -264" universe="11" />
+  <cell id="116" material="void" region="247 -248 263 -264" universe="11" />
+  <cell id="117" material="117" region="248 -249 263 -264" universe="11" />
+  <cell id="118" material="118" region="249 -250 263 -264" universe="11" />
+  <cell id="119" material="119" region="250 -251 263 -264" universe="11" />
+  <cell id="120" material="void" region="251 -252 263 -264" universe="11" />
+  <surface boundary="vacuum" coeffs="0.0" id="241" type="x-plane" />
+  <surface coeffs="5.0" id="242" type="x-plane" />
+  <surface coeffs="10.0" id="243" type="x-plane" />
+  <surface coeffs="15.0" id="244" type="x-plane" />
+  <surface coeffs="20.0" id="245" type="x-plane" />
+  <surface coeffs="25.0" id="246" type="x-plane" />
+  <surface coeffs="30.0" id="247" type="x-plane" />
+  <surface coeffs="35.0" id="248" type="x-plane" />
+  <surface coeffs="40.0" id="249" type="x-plane" />
+  <surface coeffs="45.0" id="250" type="x-plane" />
+  <surface coeffs="50.0" id="251" type="x-plane" />
+  <surface boundary="vacuum" coeffs="55.0" id="252" type="x-plane" />
+  <surface boundary="vacuum" coeffs="0.0" id="253" type="y-plane" />
+  <surface coeffs="5.0" id="254" type="y-plane" />
+  <surface coeffs="10.0" id="255" type="y-plane" />
+  <surface coeffs="15.0" id="256" type="y-plane" />
+  <surface coeffs="20.0" id="257" type="y-plane" />
+  <surface coeffs="25.0" id="258" type="y-plane" />
+  <surface coeffs="30.0" id="259" type="y-plane" />
+  <surface coeffs="35.0" id="260" type="y-plane" />
+  <surface coeffs="40.0" id="261" type="y-plane" />
+  <surface coeffs="45.0" id="262" type="y-plane" />
+  <surface coeffs="50.0" id="263" type="y-plane" />
+  <surface boundary="vacuum" coeffs="55.0" id="264" type="y-plane" />
+</geometry>
