@@ -198,8 +198,8 @@ if __name__ == '__main__':
     
 
     parser = argparse.ArgumentParser(
-        description=('Gremlin finds features sets where a given machine '
-                     'learning model performs poorly.'))
+        description=('Runs Fission Matrix GAs dynamiclly through yaml config'
+                     'files'))
 
     parser.add_argument('config_file', type=str,
                         help=('path to configuration file which Gremlin '
