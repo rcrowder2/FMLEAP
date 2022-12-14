@@ -224,9 +224,10 @@ if __name__ == '__main__':
         best_frac = config.library_params.best_fraction
         run_lib_ga(pop_size, max_generations, problem, representation,
                         pipeline, k_elites, best_frac, output_func)
-    else:
-        pass
-        #TODO: make run_std_ga function
+    elif config.algorithm == 'std':
+        run_std_ga(pop_size, max_generations, problem, representation,
+                        pipeline, k_elites, output_func)
+        
     
 
     
