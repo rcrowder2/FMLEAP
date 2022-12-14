@@ -1,0 +1,50 @@
+# Default options for FMGA with NN interpolation with FMLEAP
+
+# Algorithm to use: 
+#   std for standard GA
+#   lib for Library GA with fission matrices
+algorithm: std
+
+# Parameters that are needed for every GA
+standard_params:
+    # Population size
+    pop_size: 20
+    # number of elites in population. Default assumes no elitism but is required
+    # for Library GA
+    k_elites: 0
+    # maximum number of generations
+    max_generations: 50
+    # initialize crossover block to define parameters for pipeline
+    crossover:
+    # initialize mutation block to define parameters for pipeline
+    mutation:
+
+# Parameters for Library GA
+library_params:
+    # number of offspring to pre-evaluate each generation
+    offspring_size: 5*${standard_params.pop_size}
+    # fraction of remaining spots in the next generation to be filled by the
+    # best pre-evaluated offspring
+    best_fraction: 0.75
+
+# Definitions for parameters needed to be passed to the problem or 
+# representation constructors below
+ctor_params:
+  
+# File and class name to be used for the LEAP problem definition
+problem:
+
+# File and class name to be used for the LEAP representation definition
+representation:
+
+# Any other needed imports for the pipeline below
+imports:
+
+# List of FMLEAP operations with arguments to perform GA
+pipeline:
+
+# File and function to create and write output files
+output:
+
+# whether there is a network to train or not
+train_nn_model: False
