@@ -42,5 +42,10 @@ def create_int_vector(bounds):
     return create
 
 def create_const_vector(num,length):
+    print('here')
+    print(np.ones(length)*num)
     
-    return np.ones(length)*num
+    def create():
+        return np.ones(length)*num
+    
+    return create
