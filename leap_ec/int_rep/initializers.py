@@ -40,3 +40,7 @@ def create_int_vector(bounds):
         return np.random.randint(low, high, size=(len(low),), dtype=int)
 
     return create
+
+def create_const_vector(num,length):
+    
+    return np.ones(length)*num
